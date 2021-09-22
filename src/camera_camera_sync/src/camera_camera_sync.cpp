@@ -14,6 +14,7 @@ void CameraCameraSync::getFiles(string path, vector<string>& files)
     struct dirent *ptr;
     char base[1000];
 
+/* c_str()  返回一个指向正规C字符串的指针常量，为了兼容C语言的特性（C++中有string 而 C 中没有）*/
     char* basePath = const_cast<char*>(path.c_str()); 
 
 
@@ -26,9 +27,12 @@ void CameraCameraSync::getFiles(string path, vector<string>& files)
 
     while ((ptr=readdir(dir)) != NULL)
     {
+	/* strcmp 比较两个字符串 相等返回0，str1 < str2 返回负值 否则返回正值 */
         // current dir 
         if(strcmp(ptr->d_name, ".")==0 || strcmp(ptr->d_name, "..")==0)
             continue;
+	
+	/* d_type == 8 file  d_type == 10 link  d_type == 4 dir */
         else if(ptr->d_type == 8) // file
             sprintf(base, "%s/%s", basePath, ptr->d_name);
         //puts(base);
@@ -36,6 +40,7 @@ void CameraCameraSync::getFiles(string path, vector<string>& files)
     }
 }
 
+/* 获得图像 */
 void CameraCameraSync::getImageTimeStamp(std::string oriDirName, std::string dstDirName)
 {
     //采用该函数遍历获得得队列不是顺序的，正好适合采用时间距离最近法来匹配
@@ -108,7 +113,7 @@ std::vector<std::pair<std::string, std::string> > CameraCameraSync::imageTimeSta
     return syncPairLists;
 }
 
-
+/* 图像时间戳同步 */
 double CameraCameraSync::evaluateImageTimeStampSync(cv::Mat orgImage, cv::Mat dstImage)
 {
     //这里采用SSIM结构相似性来作为图像相似性评判
@@ -153,6 +158,7 @@ double CameraCameraSync::evaluateImageTimeStampSync(cv::Mat orgImage, cv::Mat ds
     return ssim;
 }
 
+/* 空间同步 */
 void CameraCameraSync::spatialSynchronization(cv::Mat srcImage1, cv::Mat srcImage2)
 {
     // 提取特征点    
